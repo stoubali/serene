@@ -2488,7 +2488,7 @@ body.dark .modal-box h3 { color: #f0f0f0; }
     loggedOutModal.classList.add('show');
   });
   document.getElementById('backToLogin').addEventListener('click', () => {
-    window.location.href = 'login.html';
+    window.location.href = '/login';
   });
   [logoutModal, loggedOutModal].forEach(overlay => {
     overlay.addEventListener('click', e => { if (e.target === overlay) overlay.classList.remove('show'); });

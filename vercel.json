@@ -1,0 +1,28 @@
+{
+    "rewrites": [
+        {
+            "source": "/",
+            "destination": "/index.html"
+        },
+        {
+            "source": "/landing",
+            "destination": "/landing.html"
+        },
+        {
+            "source": "/login",
+            "destination": "/login.html"
+        },
+        {
+            "source": "/manager-dashboard",
+            "destination": "/manager-dashboard.html"
+        },
+        {
+            "source": "/receptionist-dashboard",
+            "destination": "/receptionist-dashboard.html"
+        },
+        {
+            "source": "/therapist-dashboard",
+            "destination": "/therapist-dashboard.html"
+        }
+    ]
+}

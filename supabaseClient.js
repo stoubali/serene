@@ -44,18 +44,18 @@ async function getCurrentUserProfile() {
 async function requireRole(expectedRole) {
   const profile = await getCurrentUserProfile();
   if (!profile) {
-    window.location.href = "login.html";
+    window.location.href = "/login";
     return null;
   }
   if (profile.status && profile.status !== "active") {
     alert("This account has been deactivated. Contact your manager for access.");
     await sb.auth.signOut();
-    window.location.href = "login.html";
+    window.location.href = "/login";
     return null;
   }
   if (profile.role !== expectedRole) {
     alert(`This page is for ${expectedRole}s only. You're logged in as ${profile.role}.`);
-    window.location.href = "login.html";
+    window.location.href = "/login";
     return null;
   }
   return profile;

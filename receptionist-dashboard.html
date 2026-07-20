@@ -2470,7 +2470,7 @@
         loggedOutModal.classList.add('show');
       });
       document.getElementById('backToLogin').addEventListener('click', () => {
-        window.location.href = 'login.html';
+        window.location.href = '/login';
       });
       document.querySelectorAll('.modal-overlay').forEach(overlay => {
         overlay.addEventListener('click', e => { if (e.target === overlay) overlay.classList.remove('show'); });
