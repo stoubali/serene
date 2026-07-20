@@ -1,0 +1,801 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Serene · Salon Login</title>
+
+  <!-- Google Fonts: Poppins + Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz@14..32&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+
+  <!-- Font Awesome 6 -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+
+  <!-- Supabase -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabaseClient.js"></script>
+
+  <style>
+    /* ========== login.css ========== */
+    /* ----- reset & base ----- */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --midnight-blue: #0B1F3A;
+      --pure-white: #FFFFFF;
+      --burnt-orange: #FF6A00;
+      --charcoal-black: #121212;
+      --light-gray: #F5F7FA;
+      --medium-gray: #7F8C8D;
+      --shadow: 0 8px 24px rgba(11, 31, 58, .12);
+      --shadow-hover: 0 15px 35px rgba(11, 31, 58, .20);
+      --radius-card: 24px;
+      --radius-btn: 40px;
+      --transition: 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    }
+
+    html,
+    body {
+      height: 100%;
+      font-family: 'Inter', sans-serif;
+      background: var(--pure-white);
+      color: var(--charcoal-black);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ----- split-screen layout ----- */
+    .login-wrapper {
+      display: flex;
+      min-height: 100vh;
+      animation: fadeIn 0.8s ease;
+    }
+
+    @keyframes fadeIn {
+      0% {
+        opacity: 0;
+        transform: scale(0.98);
+      }
+      100% {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+
+    /* ===== LEFT SIDE – brand & image ===== */
+    .login-brand {
+      flex: 1 1 48%;
+      background: url('https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=1000&auto=format&fit=crop') center/cover no-repeat;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 48px 52px;
+      min-height: 100vh;
+      overflow: hidden;
+    }
+
+    .login-brand::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: rgba(11, 31, 58, 0.70);
+      backdrop-filter: blur(2px);
+      -webkit-backdrop-filter: blur(2px);
+      z-index: 1;
+    }
+
+    .login-brand>* {
+      position: relative;
+      z-index: 2;
+      color: var(--pure-white);
+    }
+
+    .brand-logo {
+      font-family: 'Poppins', sans-serif;
+      font-size: 2.2rem;
+      font-weight: 600;
+      letter-spacing: -0.5px;
+      margin-bottom: 28px;
+    }
+    .brand-logo i {
+      color: var(--burnt-orange);
+      margin-right: 8px;
+    }
+
+    .brand-welcome h1 {
+      font-family: 'Poppins', sans-serif;
+      font-size: 2.8rem;
+      font-weight: 600;
+      line-height: 1.2;
+      margin-bottom: 12px;
+    }
+    .brand-welcome h1 span {
+      color: var(--burnt-orange);
+    }
+    .brand-welcome p {
+      font-size: 1.1rem;
+      opacity: 0.8;
+      max-width: 460px;
+      line-height: 1.6;
+      margin-bottom: 36px;
+    }
+
+    /* feature cards (left side) */
+    .feature-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 18px;
+      max-width: 520px;
+    }
+    .feature-card {
+      background: rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 18px;
+      padding: 20px 16px;
+      transition: var(--transition);
+    }
+    .feature-card:hover {
+      background: rgba(255, 255, 255, 0.15);
+      transform: translateY(-4px);
+    }
+    .feature-card i {
+      font-size: 1.6rem;
+      color: var(--burnt-orange);
+      margin-bottom: 10px;
+    }
+    .feature-card h4 {
+      font-size: 0.95rem;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+    .feature-card p {
+      font-size: 0.8rem;
+      opacity: 0.7;
+      line-height: 1.4;
+    }
+
+    /* ===== RIGHT SIDE – login card ===== */
+    .login-form-wrap {
+      flex: 1 1 52%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 32px;
+      background: var(--pure-white);
+    }
+
+    .login-card {
+      width: 100%;
+      max-width: 420px;
+      padding: 16px 0;
+    }
+
+    .login-card .greeting {
+      margin-bottom: 32px;
+    }
+    .login-card .greeting h2 {
+      font-family: 'Poppins', sans-serif;
+      font-size: 2rem;
+      color: var(--midnight-blue);
+      font-weight: 600;
+      letter-spacing: -0.5px;
+    }
+    .login-card .greeting p {
+      color: var(--medium-gray);
+      font-size: 0.95rem;
+      margin-top: 4px;
+    }
+
+    /* form fields */
+    .form-group {
+      margin-bottom: 20px;
+      position: relative;
+    }
+    .form-group label {
+      display: block;
+      font-weight: 500;
+      font-size: 0.85rem;
+      color: var(--charcoal-black);
+      margin-bottom: 6px;
+    }
+    .form-group .input-wrap {
+      position: relative;
+    }
+    .form-group .input-wrap i {
+      position: absolute;
+      left: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--medium-gray);
+      font-size: 1rem;
+      transition: var(--transition);
+    }
+    .form-group input {
+      width: 100%;
+      padding: 14px 18px 14px 48px;
+      border: 1.5px solid #e2e8f0;
+      border-radius: 18px;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.95rem;
+      background: var(--light-gray);
+      transition: var(--transition);
+      color: var(--charcoal-black);
+    }
+    .form-group input:focus {
+      border-color: var(--burnt-orange);
+      outline: none;
+      box-shadow: 0 0 0 4px rgba(255, 106, 0, 0.08);
+      background: var(--pure-white);
+    }
+    .form-group input:focus+i {
+      color: var(--burnt-orange);
+    }
+    .form-group .input-wrap .toggle-pw {
+      position: absolute;
+      right: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      color: var(--medium-gray);
+      cursor: pointer;
+      font-size: 1rem;
+      transition: var(--transition);
+      padding: 4px;
+    }
+    .form-group .input-wrap .toggle-pw:hover {
+      color: var(--burnt-orange);
+    }
+
+    /* remember & forgot */
+    .form-actions {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin: 6px 0 24px;
+      font-size: 0.9rem;
+    }
+    .form-actions label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--medium-gray);
+      cursor: pointer;
+    }
+    .form-actions label input[type="checkbox"] {
+      accent-color: var(--burnt-orange);
+      width: 16px;
+      height: 16px;
+      cursor: pointer;
+    }
+    .form-actions a {
+      color: var(--medium-gray);
+      text-decoration: none;
+      transition: var(--transition);
+      font-weight: 500;
+    }
+    .form-actions a:hover {
+      color: var(--burnt-orange);
+    }
+
+    /* login button */
+    .btn-login {
+      width: 100%;
+      padding: 16px;
+      background: var(--burnt-orange);
+      color: var(--pure-white);
+      border: none;
+      border-radius: var(--radius-btn);
+      font-weight: 600;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: var(--transition);
+      box-shadow: 0 6px 20px rgba(255, 106, 0, 0.25);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      font-family: 'Inter', sans-serif;
+    }
+    .btn-login:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 30px rgba(255, 106, 0, 0.30);
+      background: #e05f00;
+    }
+    .btn-login:active {
+      transform: scale(0.97);
+    }
+    .btn-login .spinner {
+      display: none;
+      width: 20px;
+      height: 20px;
+      border: 3px solid rgba(255, 255, 255, 0.3);
+      border-radius: 50%;
+      border-top-color: white;
+      animation: spin 0.7s linear infinite;
+    }
+    .btn-login.loading .spinner {
+      display: inline-block;
+    }
+    .btn-login.loading .btn-text {
+      display: none;
+    }
+    .btn-login.loading {
+      gap: 0;
+      padding: 16px 20px;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    /* back to website */
+    .back-link {
+      display: block;
+      text-align: center;
+      margin-top: 20px;
+      color: var(--medium-gray);
+      text-decoration: none;
+      font-size: 0.9rem;
+      transition: var(--transition);
+    }
+    .back-link:hover {
+      color: var(--burnt-orange);
+    }
+    .back-link i {
+      margin-right: 6px;
+    }
+
+    /* ===== DEMO ACCOUNTS CARD ===== */
+    .demo-section {
+      margin-top: 32px;
+      padding-top: 24px;
+      border-top: 1px solid #eef2f6;
+    }
+    .demo-section .demo-title {
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--medium-gray);
+      font-weight: 600;
+      margin-bottom: 14px;
+    }
+    .demo-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 12px;
+    }
+    .demo-item {
+      background: var(--light-gray);
+      border-radius: 16px;
+      padding: 14px 12px;
+      transition: var(--transition);
+      border: 1px solid transparent;
+    }
+    .demo-item:hover {
+      border-color: var(--burnt-orange);
+      background: white;
+      box-shadow: var(--shadow);
+    }
+    .demo-item .role {
+      font-weight: 600;
+      font-size: 0.85rem;
+      color: var(--midnight-blue);
+    }
+    .demo-item .email {
+      font-size: 0.7rem;
+      color: var(--medium-gray);
+      word-break: break-all;
+      margin: 2px 0 6px;
+    }
+    .demo-item .use-btn {
+      background: none;
+      border: 1px solid var(--burnt-orange);
+      color: var(--burnt-orange);
+      padding: 4px 14px;
+      border-radius: 40px;
+      font-size: 0.7rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: var(--transition);
+      font-family: 'Inter', sans-serif;
+    }
+    .demo-item .use-btn:hover {
+      background: var(--burnt-orange);
+      color: white;
+    }
+
+    /* error toast */
+    .error-toast {
+      position: fixed;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      background: #ffebee;
+      color: #c62828;
+      padding: 14px 28px;
+      border-radius: 18px;
+      font-weight: 500;
+      box-shadow: var(--shadow-hover);
+      border-left: 5px solid #c62828;
+      opacity: 0;
+      transition: all 0.4s ease;
+      z-index: 999;
+      font-size: 0.95rem;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      pointer-events: none;
+    }
+    .error-toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+      pointer-events: auto;
+    }
+    .error-toast i {
+      font-size: 1.2rem;
+    }
+
+    /* ===== responsive ===== */
+    @media (max-width: 1024px) {
+      .login-brand {
+        padding: 40px 32px;
+      }
+      .brand-welcome h1 {
+        font-size: 2.2rem;
+      }
+      .feature-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+      }
+    }
+
+    @media (max-width: 820px) {
+      .login-wrapper {
+        flex-direction: column;
+      }
+      .login-brand {
+        min-height: 50vh;
+        padding: 40px 28px;
+        background-position: center 30%;
+      }
+      .login-brand::after {
+        background: rgba(11, 31, 58, 0.75);
+      }
+      .brand-welcome h1 {
+        font-size: 2rem;
+      }
+      .brand-welcome p {
+        font-size: 0.95rem;
+        max-width: 100%;
+      }
+      .feature-grid {
+        grid-template-columns: 1fr 1fr 1fr;
+        max-width: 100%;
+      }
+      .login-form-wrap {
+        padding: 40px 24px;
+      }
+      .login-card {
+        max-width: 400px;
+      }
+      .demo-grid {
+        grid-template-columns: 1fr 1fr 1fr;
+      }
+    }
+
+    @media (max-width: 540px) {
+      .login-brand {
+        min-height: 40vh;
+        padding: 28px 20px;
+      }
+      .brand-logo {
+        font-size: 1.6rem;
+        margin-bottom: 16px;
+      }
+      .brand-welcome h1 {
+        font-size: 1.6rem;
+      }
+      .brand-welcome p {
+        font-size: 0.85rem;
+        margin-bottom: 20px;
+      }
+      .feature-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+      }
+      .feature-card {
+        padding: 14px 12px;
+      }
+      .feature-card i {
+        font-size: 1.2rem;
+      }
+      .feature-card h4 {
+        font-size: 0.8rem;
+      }
+      .feature-card p {
+        font-size: 0.7rem;
+      }
+      .login-form-wrap {
+        padding: 24px 16px;
+      }
+      .login-card .greeting h2 {
+        font-size: 1.6rem;
+      }
+      .demo-grid {
+        grid-template-columns: 1fr;
+        gap: 8px;
+      }
+      .form-actions {
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+      .error-toast {
+        width: 90%;
+        font-size: 0.85rem;
+        padding: 12px 18px;
+        bottom: 16px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ===== MAIN WRAPPER ===== -->
+  <div class="login-wrapper">
+
+    <!-- LEFT: Brand / Image -->
+    <section class="login-brand" aria-label="Brand section">
+      <div class="brand-logo"><i class="fas fa-spa"></i> Serene</div>
+      <div class="brand-welcome">
+        <h1>Welcome to your<br /><span>wellness command center</span></h1>
+        <p>Manage appointments, staff, products, inventory, and your entire salon from one elegant dashboard.</p>
+      </div>
+      <div class="feature-grid">
+        <div class="feature-card">
+          <i class="fas fa-calendar-check"></i>
+          <h4>Appointment Management</h4>
+          <p>Book, reschedule, and track in real time.</p>
+        </div>
+        <div class="feature-card">
+          <i class="fas fa-users-cog"></i>
+          <h4>Staff & Inventory</h4>
+          <p>Manage your team and stock effortlessly.</p>
+        </div>
+        <div class="feature-card">
+          <i class="fas fa-chart-line"></i>
+          <h4>Sales & Analytics</h4>
+          <p>Insights to grow your business.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- RIGHT: Login Form -->
+    <section class="login-form-wrap" aria-label="Login section">
+      <div class="login-card">
+
+        <div class="greeting">
+          <h2>Welcome Back</h2>
+          <p>Sign in to continue to your dashboard.</p>
+        </div>
+
+        <!-- login form -->
+        <form id="loginForm" novalidate>
+          <div class="form-group">
+            <label for="email"><i class="far fa-envelope" style="margin-right:6px;"></i> Email</label>
+            <div class="input-wrap">
+              <i class="fas fa-envelope"></i>
+              <input type="email" id="email" placeholder="manager@demo.com" value="manager@demo.com" required />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="password"><i class="fas fa-lock" style="margin-right:6px;"></i> Password</label>
+            <div class="input-wrap">
+              <i class="fas fa-lock"></i>
+              <input type="password" id="password" placeholder="••••••••" value="123456" required />
+              <button type="button" class="toggle-pw" id="togglePw" aria-label="Toggle password visibility">
+                <i class="fas fa-eye"></i>
+              </button> 
+            </div>
+          </div>
+
+          <div class="form-actions">
+            <label>
+              <input type="checkbox" checked /> Remember me
+            </label>
+            <a href="#" onclick="alert('Reset link sent (demo)'); return false;">Forgot password?</a>
+          </div>
+
+          <button type="submit" class="btn-login" id="loginBtn">
+            <span class="btn-text"><i class="fas fa-sign-in-alt"></i> Login</span>
+            <span class="spinner"></span>
+          </button>
+        </form>
+
+        <a href="#" class="back-link" onclick="alert('Return to website (demo)'); return false;">
+          <i class="fas fa-arrow-left"></i> Back to Serene website
+        </a>
+
+        <!-- DEMO ACCOUNTS -->
+        <div class="demo-section">
+          <div class="demo-title"><i class="fas fa-user-circle"></i> Demo Accounts</div>
+          <div class="demo-grid" id="demoGrid">
+            <!-- manager -->
+            <div class="demo-item" data-email="manager@demo.com" data-pw="123456">
+              <div class="role">👔 Manager</div>
+              <div class="email">manager@demo.com</div>
+              <button class="use-btn" data-email="manager@demo.com" data-pw="123456">Use Account</button>
+            </div>
+            <!-- therapist -->
+            <div class="demo-item" data-email="therapist@demo.com" data-pw="123456">
+              <div class="role">🧖 Therapist</div>
+              <div class="email">therapist@demo.com</div>
+              <button class="use-btn" data-email="therapist@demo.com" data-pw="123456">Use Account</button>
+            </div>
+            <!-- receptionist -->
+            <div class="demo-item" data-email="reception@demo.com" data-pw="123456">
+              <div class="role">📋 Receptionist</div>
+              <div class="email">reception@demo.com</div>
+              <button class="use-btn" data-email="reception@demo.com" data-pw="123456">Use Account</button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+  </div>
+
+  <!-- error toast -->
+  <div class="error-toast" id="errorToast">
+    <i class="fas fa-exclamation-circle"></i>
+    <span id="errorMsg">Invalid demo credentials.</span>
+  </div>
+
+  <!-- ========== login.js ========== -->
+  <script>
+    (function() {
+      'use strict';
+
+      // DOM refs
+      const form = document.getElementById('loginForm');
+      const emailInput = document.getElementById('email');
+      const passwordInput = document.getElementById('password');
+      const loginBtn = document.getElementById('loginBtn');
+      const togglePwBtn = document.getElementById('togglePw');
+      const errorToast = document.getElementById('errorToast');
+      const errorMsg = document.getElementById('errorMsg');
+
+      // ----- toggle password visibility -----
+      togglePwBtn.addEventListener('click', function() {
+        const isPassword = passwordInput.getAttribute('type') === 'password';
+        passwordInput.setAttribute('type', isPassword ? 'text' : 'password');
+        this.querySelector('i').classList.toggle('fa-eye');
+        this.querySelector('i').classList.toggle('fa-eye-slash');
+      });
+
+      // ----- demo "Use Account" buttons -----
+      document.querySelectorAll('.use-btn').forEach(function(btn) {
+        btn.addEventListener('click', function(e) {
+          e.stopPropagation();
+          const email = this.getAttribute('data-email');
+          const pw = this.getAttribute('data-pw');
+          emailInput.value = email;
+          passwordInput.value = pw;
+          // slight visual feedback
+          const parent = this.closest('.demo-item');
+          parent.style.borderColor = 'var(--burnt-orange)';
+          setTimeout(() => { parent.style.borderColor = ''; }, 600);
+        });
+      });
+
+      // ----- show error toast -----
+      function showError(message) {
+        errorMsg.textContent = message || 'Invalid demo credentials.';
+        errorToast.classList.add('show');
+        clearTimeout(errorToast._hideTimer);
+        errorToast._hideTimer = setTimeout(function() {
+          errorToast.classList.remove('show');
+        }, 4000);
+      }
+
+      // hide toast on click
+      errorToast.addEventListener('click', function() {
+        this.classList.remove('show');
+        clearTimeout(this._hideTimer);
+      });
+
+      // ----- login logic (real Supabase auth) -----
+      const dashboardByRole = {
+        manager: 'manager-dashboard.html',
+        therapist: 'therapist-dashboard.html',
+        receptionist: 'receptionist-dashboard.html'
+      };
+
+      form.addEventListener('submit', async function(e) {
+        e.preventDefault();
+
+        const email = emailInput.value.trim().toLowerCase();
+        const password = passwordInput.value.trim();
+
+        if (!email || !password) {
+          showError('Please fill in both fields.');
+          return;
+        }
+
+        loginBtn.classList.add('loading');
+        loginBtn.disabled = true;
+
+        // 1) Authenticate against Supabase Auth
+        const { data: authData, error: authError } = await sb.auth.signInWithPassword({
+          email,
+          password
+        });
+
+        if (authError) {
+          loginBtn.classList.remove('loading');
+          loginBtn.disabled = false;
+          showError(authError.message || 'Invalid email or password.');
+          form.style.animation = 'shake 0.4s ease';
+          setTimeout(() => { form.style.animation = ''; }, 500);
+          return;
+        }
+
+        // 2) Look up the role from public.users to know which dashboard to open
+        const { data: profile, error: profileError } = await sb
+          .from('users')
+          .select('role, full_name')
+          .eq('id', authData.user.id)
+          .single();
+
+        loginBtn.classList.remove('loading');
+        loginBtn.disabled = false;
+
+        if (profileError || !profile) {
+          showError('Logged in, but no matching profile was found in the users table.');
+          return;
+        }
+
+        const destination = dashboardByRole[profile.role];
+        if (!destination) {
+          showError(`No dashboard configured for role "${profile.role}".`);
+          return;
+        }
+
+        window.location.href = destination;
+      });
+
+      // ----- inject shake keyframes if not present -----
+      if (!document.getElementById('shakeStyle')) {
+        const style = document.createElement('style');
+        style.id = 'shakeStyle';
+        style.textContent = `
+              @keyframes shake {
+                0%, 100% { transform: translateX(0); }
+                20% { transform: translateX(-12px); }
+                40% { transform: translateX(12px); }
+                60% { transform: translateX(-8px); }
+                80% { transform: translateX(8px); }
+              }
+            `;
+        document.head.appendChild(style);
+      }
+
+      // ----- pre-fill demo account on load (optional) -----
+      // (already filled with manager by default)
+
+    })();
+  </script>
+
+</body>
+</html>
