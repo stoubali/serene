@@ -871,6 +871,66 @@
       border: 1px solid transparent;
     }
     .entity-card:hover { transform: translateY(-5px); box-shadow: var(--shadow-hover); }
+
+    /* ---------- APPOINTMENT CALENDAR VIEW ---------- */
+    .view-toggle { display: flex; gap: 4px; background: var(--light-gray); padding: 4px; border-radius: 40px; }
+    body.dark .view-toggle { background: #333; }
+    .view-toggle-btn {
+      border: none; background: transparent; padding: 8px 16px; border-radius: 40px;
+      font-weight: 600; font-size: 13px; cursor: pointer; color: var(--medium-gray); transition: 0.2s;
+    }
+    .view-toggle-btn.active { background: var(--pure-white); color: var(--burnt-orange); box-shadow: var(--shadow); }
+    body.dark .view-toggle-btn.active { background: #262626; }
+
+    .calendar-nav { display: flex; align-items: center; gap: 16px; margin-bottom: 18px; }
+    .calendar-nav button.cal-arrow {
+      background: var(--pure-white); border: none; width: 38px; height: 38px; border-radius: 50%;
+      box-shadow: var(--shadow); cursor: pointer; color: var(--midnight-blue); font-size: 14px;
+    }
+    body.dark .calendar-nav button.cal-arrow { background: #262626; color: #eaeaea; }
+    #calToday {
+      background: var(--light-gray); border: none; padding: 8px 18px; border-radius: 40px;
+      font-weight: 600; font-size: 13px; cursor: pointer; color: var(--midnight-blue);
+    }
+    body.dark #calToday { background: #333; color: #eaeaea; }
+    #calLabel { font-family: 'Poppins', sans-serif; font-weight: 600; font-size: 18px; color: var(--midnight-blue); min-width: 200px; }
+    body.dark #calLabel { color: #f0f0f0; }
+
+    .month-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; }
+    .month-daylabel { text-align: center; font-size: 11px; font-weight: 600; color: var(--medium-gray); text-transform: uppercase; padding-bottom: 4px; }
+    .month-cell {
+      background: var(--pure-white); border-radius: 14px; padding: 8px; min-height: 92px;
+      box-shadow: var(--shadow); cursor: pointer; transition: 0.2s; display: flex; flex-direction: column;
+      overflow: hidden;
+    }
+    .month-cell:hover { box-shadow: var(--shadow-hover); transform: translateY(-2px); }
+    .month-cell.muted { opacity: 0.35; cursor: default; }
+    .month-cell.muted:hover { transform: none; box-shadow: var(--shadow); }
+    .month-cell.today { border: 2px solid var(--burnt-orange); }
+    body.dark .month-cell { background: #262626; }
+    .month-cell .day-num { font-weight: 600; font-size: 13px; color: var(--midnight-blue); margin-bottom: 4px; }
+    body.dark .month-cell .day-num { color: #eaeaea; }
+    .month-cell .appt-chip {
+      font-size: 10px; background: rgba(255, 106, 0, 0.12); color: var(--burnt-orange);
+      padding: 2px 6px; border-radius: 6px; margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .month-cell .appt-more { font-size: 10px; color: var(--medium-gray); }
+
+    .week-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 12px; align-items: start; }
+    .week-col { background: var(--pure-white); border-radius: 14px; padding: 12px; box-shadow: var(--shadow); min-height: 200px; }
+    body.dark .week-col { background: #262626; }
+    .week-col.today { border: 2px solid var(--burnt-orange); }
+    .week-col .week-daylabel { font-weight: 600; font-size: 13px; color: var(--midnight-blue); margin-bottom: 8px; text-align: center; }
+    body.dark .week-col .week-daylabel { color: #eaeaea; }
+    .week-appt-item { font-size: 12px; padding: 6px 8px; border-radius: 8px; background: var(--light-gray); margin-bottom: 6px; cursor: pointer; transition: 0.15s; }
+    .week-appt-item:hover { background: rgba(255, 106, 0, 0.1); }
+    body.dark .week-appt-item { background: #333; }
+    .week-appt-item .wa-time { font-weight: 700; color: var(--burnt-orange); }
+    .week-empty { font-size: 11px; color: var(--medium-gray); text-align: center; padding: 14px 0; }
+
+    @media (max-width: 900px) {
+      .month-grid, .week-grid { grid-template-columns: repeat(7, minmax(70px, 1fr)); overflow-x: auto; }
+    }
     .entity-card .entity-top {
       display: flex;
       align-items: center;
@@ -1233,12 +1293,29 @@
           <option value="completed">Completed</option>
           <option value="cancelled">Cancelled</option>
         </select>
+        <div class="view-toggle" id="apptViewToggle">
+          <button class="view-toggle-btn active" data-view="list">List</button>
+          <button class="view-toggle-btn" data-view="day">Day</button>
+          <button class="view-toggle-btn" data-view="week">Week</button>
+          <button class="view-toggle-btn" data-view="month">Month</button>
+        </div>
         <button class="filter-bar btn-primary" id="apptNewBtn"><i class="fas fa-plus"></i> New Appointment</button>
       </div>
-      <div class="table-wrap">
+
+      <div class="table-wrap" id="apptListView">
         <table><thead><tr><th>Client</th><th>Service</th><th>Therapist</th><th>Time</th><th>Status</th><th>Actions</th></tr></thead>
           <tbody id="apptFullTable"></tbody>
         </table>
+      </div>
+
+      <div id="apptCalendarView" style="display:none;">
+        <div class="calendar-nav">
+          <button class="cal-arrow" id="calPrev"><i class="fas fa-chevron-left"></i></button>
+          <div id="calLabel"></div>
+          <button class="cal-arrow" id="calNext"><i class="fas fa-chevron-right"></i></button>
+          <button id="calToday">Today</button>
+        </div>
+        <div id="calGrid"></div>
       </div>
     </div>
 
@@ -1745,7 +1822,7 @@
         const { data, error } = await sb
           .from('appointments')
           .select(`
-            id, start_time, appointment_status,
+            id, appointment_date, start_time, appointment_status,
             customers ( full_name ),
             services ( name ),
             therapists ( users ( full_name ) )
@@ -1760,6 +1837,7 @@
 
         appointments = data.map(a => ({
           id: a.id,
+          rawDate: a.appointment_date,
           client: a.customers?.full_name || 'Unknown',
           service: a.services?.name || 'Unknown',
           therapist: a.therapists?.users?.full_name || 'Unassigned',
@@ -1769,6 +1847,8 @@
 
         renderDashboardAppointments();
         renderApptTable(appointments);
+        buildApptsByDate();
+        if (calendarView) renderCalendar();
       }
 
       function renderDashboardAppointments() {
@@ -2445,6 +2525,159 @@
       }
       document.getElementById('apptSearch').addEventListener('input', filterAppointments);
       document.getElementById('apptStatusFilter').addEventListener('change', filterAppointments);
+
+      // =====================================================
+      // APPOINTMENTS — CALENDAR VIEW (Day / Week / Month)
+      // =====================================================
+      let calendarView = null; // null = list view active; otherwise 'day'|'week'|'month'
+      let calendarDate = new Date();
+      let apptsByDate = {};
+
+      function toDateStr(d) {
+        return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+      }
+      function buildApptsByDate() {
+        apptsByDate = {};
+        appointments.forEach(a => {
+          if (!a.rawDate) return;
+          if (!apptsByDate[a.rawDate]) apptsByDate[a.rawDate] = [];
+          apptsByDate[a.rawDate].push(a);
+        });
+      }
+
+      function renderCalendar() {
+        if (calendarView === 'month') renderMonthView(calendarDate);
+        else if (calendarView === 'week') renderWeekView(calendarDate);
+        else if (calendarView === 'day') renderDayView(calendarDate);
+      }
+
+      function renderMonthView(date) {
+        const year = date.getFullYear(), month = date.getMonth();
+        document.getElementById('calLabel').textContent = date.toLocaleDateString('en-GB', { month: 'long', year: 'numeric' });
+        const grid = document.getElementById('calGrid');
+        grid.className = 'month-grid';
+        grid.innerHTML = '';
+        ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].forEach(d => {
+          const el = document.createElement('div');
+          el.className = 'month-daylabel';
+          el.textContent = d;
+          grid.appendChild(el);
+        });
+        const firstOfMonth = new Date(year, month, 1);
+        const leading = firstOfMonth.getDay();
+        const daysInMonth = new Date(year, month + 1, 0).getDate();
+        const prevMonthDays = new Date(year, month, 0).getDate();
+        const todayStr = toDateStr(new Date());
+
+        for (let i = 0; i < leading; i++) {
+          const cell = document.createElement('div');
+          cell.className = 'month-cell muted';
+          cell.innerHTML = `<div class="day-num">${prevMonthDays - leading + i + 1}</div>`;
+          grid.appendChild(cell);
+        }
+        for (let day = 1; day <= daysInMonth; day++) {
+          const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+          const dayAppts = apptsByDate[dateStr] || [];
+          const cell = document.createElement('div');
+          cell.className = 'month-cell' + (dateStr === todayStr ? ' today' : '');
+          let chipsHtml = dayAppts.slice(0, 3).map(a => `<div class="appt-chip">${a.time} ${a.client}</div>`).join('');
+          if (dayAppts.length > 3) chipsHtml += `<div class="appt-more">+${dayAppts.length - 3} more</div>`;
+          cell.innerHTML = `<div class="day-num">${day}</div>${chipsHtml}`;
+          cell.addEventListener('click', () => {
+            calendarDate = new Date(year, month, day);
+            setApptView('day');
+          });
+          grid.appendChild(cell);
+        }
+      }
+
+      function renderWeekView(date) {
+        const start = new Date(date);
+        start.setDate(start.getDate() - start.getDay());
+        const end = new Date(start); end.setDate(end.getDate() + 6);
+        document.getElementById('calLabel').textContent =
+          `${start.toLocaleDateString('en-GB', { month: 'short', day: 'numeric' })} – ${end.toLocaleDateString('en-GB', { month: 'short', day: 'numeric' })}`;
+        const grid = document.getElementById('calGrid');
+        grid.className = 'week-grid';
+        grid.innerHTML = '';
+        const todayStr = toDateStr(new Date());
+        for (let i = 0; i < 7; i++) {
+          const d = new Date(start); d.setDate(start.getDate() + i);
+          const dateStr = toDateStr(d);
+          const dayAppts = (apptsByDate[dateStr] || []).slice().sort((a, b) => a.time.localeCompare(b.time));
+          const col = document.createElement('div');
+          col.className = 'week-col' + (dateStr === todayStr ? ' today' : '');
+          col.innerHTML = `<div class="week-daylabel">${d.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric' })}</div>` +
+            (dayAppts.length
+              ? dayAppts.map(a => `<div class="week-appt-item" data-appt-id="${a.id}"><span class="wa-time">${a.time}</span> ${a.client}<br><span style="color:var(--medium-gray);">${a.service}</span></div>`).join('')
+              : `<div class="week-empty">—</div>`);
+          grid.appendChild(col);
+        }
+      }
+
+      function renderDayView(date) {
+        const dateStr = toDateStr(date);
+        document.getElementById('calLabel').textContent = date.toLocaleDateString('en-GB', { weekday: 'long', month: 'long', day: 'numeric' });
+        const dayAppts = (apptsByDate[dateStr] || []).slice().sort((a, b) => a.time.localeCompare(b.time));
+        const grid = document.getElementById('calGrid');
+        grid.className = '';
+        grid.innerHTML = dayAppts.length
+          ? `<div class="card">` + dayAppts.map(a => `
+              <div class="schedule-item" data-appt-id="${a.id}" style="cursor:pointer;">
+                <span class="schedule-time">${a.time}</span>
+                <div class="schedule-info">
+                  <div class="name">${a.client}</div>
+                  <div class="service">${a.service} · ${a.therapist}</div>
+                </div>
+                <span class="schedule-status ${a.status.toLowerCase().replace(' ', '-')}">${a.status}</span>
+              </div>`).join('') + `</div>`
+          : `<div class="card" style="text-align:center;color:var(--medium-gray);padding:32px;">No appointments this day.</div>`;
+      }
+
+      function setApptView(view) {
+        document.querySelectorAll('.view-toggle-btn').forEach(b => b.classList.toggle('active', b.dataset.view === view));
+        if (view === 'list') {
+          document.getElementById('apptListView').style.display = '';
+          document.getElementById('apptCalendarView').style.display = 'none';
+          calendarView = null;
+        } else {
+          document.getElementById('apptListView').style.display = 'none';
+          document.getElementById('apptCalendarView').style.display = 'block';
+          calendarView = view;
+          renderCalendar();
+        }
+      }
+      document.getElementById('apptViewToggle').addEventListener('click', e => {
+        const btn = e.target.closest('.view-toggle-btn');
+        if (btn) setApptView(btn.dataset.view);
+      });
+      document.getElementById('calPrev').addEventListener('click', () => {
+        if (calendarView === 'month') calendarDate.setMonth(calendarDate.getMonth() - 1);
+        else if (calendarView === 'week') calendarDate.setDate(calendarDate.getDate() - 7);
+        else calendarDate.setDate(calendarDate.getDate() - 1);
+        renderCalendar();
+      });
+      document.getElementById('calNext').addEventListener('click', () => {
+        if (calendarView === 'month') calendarDate.setMonth(calendarDate.getMonth() + 1);
+        else if (calendarView === 'week') calendarDate.setDate(calendarDate.getDate() + 7);
+        else calendarDate.setDate(calendarDate.getDate() + 1);
+        renderCalendar();
+      });
+      document.getElementById('calToday').addEventListener('click', () => {
+        calendarDate = new Date();
+        renderCalendar();
+      });
+      // Clicking an appointment inside week/day views opens the same detail modal used elsewhere
+      document.addEventListener('click', function(e) {
+        const item = e.target.closest('.week-appt-item[data-appt-id], .schedule-item[data-appt-id]');
+        if (!item) return;
+        const appt = appointments.find(a => a.id === item.dataset.apptId);
+        if (!appt) return;
+        showDetail('Appointment Details', [
+          ['Client', appt.client], ['Service', appt.service], ['Therapist', appt.therapist],
+          ['Time', appt.time], ['Status', appt.status]
+        ]);
+      });
 
       // =====================================================
       // CLIENTS PAGE
@@ -3303,7 +3536,7 @@
         loggedOutModal.classList.add('show');
       });
       document.getElementById('backToLogin').addEventListener('click', () => {
-        window.location.href = '/login';
+        window.location.href = 'login.html';
       });
 
       // ----- TOPBAR SEARCH: proxies into the active page's own search box -----
