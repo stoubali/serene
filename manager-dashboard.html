@@ -1373,9 +1373,9 @@
         <p>Revenue performance and recent transactions.</p>
       </div>
       <div class="stats-grid" id="salesStatsGrid">
-        <div class="stat-card"><div class="stat-head"><span>Total Sales</span><i class="fas fa-coins"></i></div><div class="stat-value">58,420 MAD</div><span class="stat-trend"><i class="fas fa-arrow-up"></i> +9.4%</span></div>
+        <div class="stat-card"><div class="stat-head"><span>Total Sales</span><i class="fas fa-coins"></i></div><div class="stat-value">58,420 AED</div><span class="stat-trend"><i class="fas fa-arrow-up"></i> +9.4%</span></div>
         <div class="stat-card"><div class="stat-head"><span>Transactions</span><i class="fas fa-receipt"></i></div><div class="stat-value">312</div><span class="stat-trend"><i class="fas fa-arrow-up"></i> +6%</span></div>
-        <div class="stat-card"><div class="stat-head"><span>Avg. Ticket</span><i class="fas fa-tag"></i></div><div class="stat-value">187 MAD</div><span class="stat-trend"><i class="fas fa-arrow-up"></i> +2.1%</span></div>
+        <div class="stat-card"><div class="stat-head"><span>Avg. Ticket</span><i class="fas fa-tag"></i></div><div class="stat-value">187 AED</div><span class="stat-trend"><i class="fas fa-arrow-up"></i> +2.1%</span></div>
         <div class="stat-card"><div class="stat-head"><span>Refunds</span><i class="fas fa-undo"></i></div><div class="stat-value" id="refundsCount">…</div><span class="stat-trend down"><i class="fas fa-arrow-down"></i> total</span></div>
       </div>
       <div class="filter-bar">
@@ -1595,7 +1595,7 @@
       </div>
       <div class="form-row-2">
         <div class="form-group">
-          <label>Selling Price (MAD)</label>
+          <label>Selling Price (AED)</label>
           <input type="number" id="newProductPrice" min="0" step="0.01" value="0" />
         </div>
         <div class="form-group">
@@ -1622,7 +1622,7 @@
       <p id="editProductSubtitle"></p>
       <div class="form-row-2">
         <div class="form-group">
-          <label>Selling Price (MAD)</label>
+          <label>Selling Price (AED)</label>
           <input type="number" id="editProductPrice" min="0" step="0.01" />
         </div>
         <div class="form-group">
@@ -1652,7 +1652,7 @@
       </div>
       <div class="form-row-2">
         <div class="form-group">
-          <label>Amount (MAD)</label>
+          <label>Amount (AED)</label>
           <input type="number" id="newExpenseAmount" min="0" step="0.01" value="0" />
         </div>
         <div class="form-group">
@@ -1715,7 +1715,7 @@
       </div>
       <div class="form-row-2">
         <div class="form-group">
-          <label>Salary (MAD/month)</label>
+          <label>Salary (AED/month)</label>
           <input type="number" id="editStaffSalary" min="0" step="0.01" />
         </div>
         <div class="form-group">
@@ -1753,7 +1753,7 @@
         <select id="newRefundSale"><option value="">Loading sales…</option></select>
       </div>
       <div class="form-group">
-        <label>Refund Amount (MAD)</label>
+        <label>Refund Amount (AED)</label>
         <input type="number" id="newRefundAmount" min="0" step="0.01" value="0" />
       </div>
       <div class="form-group">
@@ -1822,7 +1822,7 @@
         const { data, error } = await sb
           .from('appointments')
           .select(`
-            id, appointment_date, start_time, appointment_status,
+            id, appointment_date, start_time, appointment_status, price,
             customers ( full_name ),
             services ( name ),
             therapists ( users ( full_name ) )
@@ -1842,6 +1842,7 @@
           service: a.services?.name || 'Unknown',
           therapist: a.therapists?.users?.full_name || 'Unassigned',
           time: a.start_time?.slice(0,5) || '',
+          amount: a.price || 0,
           status: a.appointment_status.charAt(0).toUpperCase() + a.appointment_status.slice(1)
         }));
 
@@ -1904,7 +1905,7 @@
         if (todayErr) console.error('Failed to load today\'s appointment count:', todayErr.message);
 
         const cards = document.querySelectorAll('#statsGrid .stat-value');
-        animateStat(cards[0], data.daily_revenue, ' MAD');
+        animateStat(cards[0], data.daily_revenue, ' AED');
         animateStat(cards[1], todayApptCount ?? 0);
         animateStat(cards[2], data.total_customers);
         animateStat(cards[3], data.low_stock_products);
@@ -1937,7 +1938,7 @@
           name: c.full_name,
           phone: c.phone || '—',
           visits: c.visits,
-          spent: Number(c.spent).toLocaleString() + ' MAD'
+          spent: Number(c.spent).toLocaleString() + ' AED'
         }));
         renderClients(clients);
         populateApptDropdowns();
@@ -1950,7 +1951,7 @@
           id: s.id,
           name: s.name,
           duration: s.duration + ' min',
-          price: Number(s.price).toLocaleString() + ' MAD',
+          price: Number(s.price).toLocaleString() + ' AED',
           rawDuration: s.duration,
           rawPrice: s.price,
           bookings: null // not tracked per-service yet
@@ -1968,7 +1969,7 @@
           category: p.category || '—',
           stock: p.stock_quantity,
           min: p.minimum_stock,
-          price: Number(p.selling_price).toLocaleString() + ' MAD'
+          price: Number(p.selling_price).toLocaleString() + ' AED'
         }));
         renderProducts(products);
         renderInventory();
@@ -1986,7 +1987,7 @@
           client: t.customers?.full_name || 'Walk-in',
           item: 'Product purchase',
           date: new Date(t.sale_date).toLocaleDateString('en-GB', { month: 'short', day: 'numeric' }),
-          amount: Number(t.total_amount).toLocaleString() + ' MAD',
+          amount: Number(t.total_amount).toLocaleString() + ' AED',
           rawTotal: Number(t.total_amount),
           method: t.payment_method.charAt(0).toUpperCase() + t.payment_method.slice(1)
         }));
@@ -2008,7 +2009,7 @@
           ? refunds.map(r => `
             <tr>
               <td>${r.product_sales?.customers?.full_name || 'Sale #' + r.sale_id?.slice(0, 8)}</td>
-              <td>${Number(r.amount).toLocaleString()} MAD</td>
+              <td>${Number(r.amount).toLocaleString()} AED</td>
               <td>${r.reason || '—'}</td>
               <td>${new Date(r.created_at).toLocaleDateString('en-GB', { month: 'short', day: 'numeric' })}</td>
             </tr>`).join('')
@@ -2068,7 +2069,7 @@
           desc: e.description || e.category,
           category: e.category,
           date: new Date(e.expense_date).toLocaleDateString('en-GB', { month: 'short', day: 'numeric' }),
-          amount: Number(e.amount).toLocaleString() + ' MAD'
+          amount: Number(e.amount).toLocaleString() + ' AED'
         }));
         renderExpenses();
       }
@@ -2108,7 +2109,7 @@
           div.className = 'service-card';
           div.innerHTML = `
             <div><strong>${s.name}</strong><br><small>${s.bookings} bookings</small></div>
-            <div><strong>${s.revenue.toLocaleString()} MAD</strong></div>
+            <div><strong>${s.revenue.toLocaleString()} AED</strong></div>
           `;
           servDiv.appendChild(div);
         });
@@ -2166,7 +2167,7 @@
           bar.style.height = (10 + (v / max) * 110) + 'px';
           const tooltip = document.createElement('div');
           tooltip.className = 'bar-tooltip';
-          tooltip.textContent = `${days[i]}: ${v.toLocaleString()} MAD`;
+          tooltip.textContent = `${days[i]}: ${v.toLocaleString()} AED`;
           const label = document.createElement('div');
           label.className = 'bar-label';
           label.textContent = days[i];
@@ -2325,7 +2326,7 @@
               current = target;
               clearInterval(timer);
             }
-            el.textContent = current + (el.textContent.includes('MAD') ? ' MAD' : '');
+            el.textContent = current + (el.textContent.includes('AED') ? ' AED' : '');
           }, 30);
         }
       });
@@ -2803,14 +2804,14 @@
         });
         salesData.forEach(s => {
           feed.push({
-            text: `Product sold · ${s.customers?.full_name || 'Walk-in'} (${Number(s.total_amount).toLocaleString()} MAD)`,
+            text: `Product sold · ${s.customers?.full_name || 'Walk-in'} (${Number(s.total_amount).toLocaleString()} AED)`,
             icon: 'fa-shopping-bag',
             at: s.sale_date
           });
         });
         expensesData.forEach(e => {
           feed.push({
-            text: `Expense added · ${e.description || e.category} (${Number(e.amount).toLocaleString()} MAD)`,
+            text: `Expense added · ${e.description || e.category} (${Number(e.amount).toLocaleString()} AED)`,
             icon: 'fa-receipt',
             at: e.created_at || e.expense_date
           });
@@ -2927,9 +2928,9 @@
         const count = salesTx.length;
         const avg = count ? Math.round(total / count) : 0;
         const cards = document.querySelectorAll('#salesStatsGrid .stat-value');
-        if (cards[0]) cards[0].textContent = total.toLocaleString() + ' MAD';
+        if (cards[0]) cards[0].textContent = total.toLocaleString() + ' AED';
         if (cards[1]) cards[1].textContent = count;
-        if (cards[2]) cards[2].textContent = avg.toLocaleString() + ' MAD';
+        if (cards[2]) cards[2].textContent = avg.toLocaleString() + ' AED';
         // Refunds aren't tracked yet — leave as-is (static demo value)
       }
 
@@ -2956,7 +2957,7 @@
             <div class="entity-stats">
               ${s.therapistId
                 ? `<div>Today<strong>${s.today ?? 0} appts</strong></div><div>Rating<strong><i class="fas fa-star" style="color:var(--burnt-orange);font-size:12px;"></i> ${s.rating || 'N/A'}</strong></div>`
-                : `<div>Phone<strong>${s.phone}</strong></div><div>Salary<strong>${s.salary ? Number(s.salary).toLocaleString() + ' MAD' : '—'}</strong></div>`}
+                : `<div>Phone<strong>${s.phone}</strong></div><div>Salary<strong>${s.salary ? Number(s.salary).toLocaleString() + ' AED' : '—'}</strong></div>`}
             </div>
             <div style="display:flex;justify-content:space-between;align-items:center;margin-top:12px;padding-top:12px;border-top:1px solid #f0f0f0;">
               <span class="badge-status ${statusBadgeClass}">${statusLabel}</span>
@@ -3026,13 +3027,13 @@
         if (name === 'Monthly Revenue') {
           downloadCSV('monthly-revenue.csv', appointments
             .filter(a => a.status === 'Completed')
-            .map(a => ({ client: a.client, service: a.service, therapist: a.therapist, time: a.time })));
+            .map(a => ({ client: a.client, service: a.service, therapist: a.therapist, date: a.rawDate, time: a.time, amount_AED: a.amount })));
         } else if (name === 'Client Retention') {
-          downloadCSV('client-retention.csv', clients.map(c => ({ name: c.name, phone: c.phone, visits: c.visits, spent: c.spent })));
+          downloadCSV('client-retention.csv', clients.map(c => ({ name: c.name, phone: c.phone, visits: c.visits, spent_AED: c.spent })));
         } else if (name === 'Inventory Usage') {
-          downloadCSV('inventory-usage.csv', products.map(p => ({ name: p.name, category: p.category, stock: p.stock, min: p.min, price: p.price })));
+          downloadCSV('inventory-usage.csv', products.map(p => ({ name: p.name, category: p.category, stock: p.stock, min: p.min, price_AED: p.price })));
         } else if (name === 'Staff Performance') {
-          downloadCSV('staff-performance.csv', staff.map(s => ({ name: s.name, role: s.roleLabel, status: s.status, today_appointments: s.today ?? '' })));
+          downloadCSV('staff-performance.csv', staff.map(s => ({ name: s.name, role: s.roleLabel, status: s.status, today_appointments: s.today ?? '', salary_AED: s.salary ?? '' })));
         }
       });
 
@@ -3230,7 +3231,7 @@
           expense_date: new Date().toISOString().split('T')[0]
         });
         if (error) { alert('Could not add expense: ' + error.message); return; }
-        logActivity('expense_added', `Expense logged: ${category} — ${amount} MAD`);
+        logActivity('expense_added', `Expense logged: ${category} — ${amount} AED`);
 
         closeModal('newExpenseModal');
         loadExpenses();
@@ -3315,7 +3316,7 @@
           sale_id: saleId, amount, reason, refunded_by: profile.id
         });
         if (error) { alert('Could not record refund: ' + error.message); return; }
-        logActivity('refund_recorded', `Refund recorded: ${amount} MAD`);
+        logActivity('refund_recorded', `Refund recorded: ${amount} AED`);
 
         closeModal('newRefundModal');
         loadRefunds();

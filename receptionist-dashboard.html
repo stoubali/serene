@@ -1100,7 +1100,7 @@
         </div>
         <div style="margin-top:14px;padding-top:14px;border-top:1px solid #f0f0f0;display:flex;gap:20px;flex-wrap:wrap;font-size:13px;color:var(--medium-gray);">
           <span><i class="fas fa-clock" style="color:var(--burnt-orange);width:18px;"></i> Duration: 60 min</span>
-          <span><i class="fas fa-tag" style="color:var(--burnt-orange);width:18px;"></i> Price: 150 MAD</span>
+          <span><i class="fas fa-tag" style="color:var(--burnt-orange);width:18px;"></i> Price: 150 AED</span>
           <span><i class="fas fa-user" style="color:var(--burnt-orange);width:18px;"></i> Therapist: Anna</span>
         </div>
       </div>
@@ -1136,7 +1136,7 @@
         <div style="display:flex;flex-wrap:wrap;gap:16px;justify-content:space-between;align-items:center;">
           <div>
             <div style="font-weight:600;font-size:18px;color:var(--midnight-blue);">Sophie Turner</div>
-            <div style="color:var(--medium-gray);font-size:14px;">Massage Oil (2x) · 180 MAD · Card</div>
+            <div style="color:var(--medium-gray);font-size:14px;">Massage Oil (2x) · 180 AED · Card</div>
           </div>
           <div>
             <span class="badge-status completed" style="margin-right:12px;">Completed</span>
@@ -1345,7 +1345,7 @@
         <select id="newRefundSale"><option value="">Loading sales…</option></select>
       </div>
       <div class="form-group">
-        <label>Refund Amount (MAD)</label>
+        <label>Refund Amount (AED)</label>
         <input type="number" id="newRefundAmount" min="0" step="0.01" value="0" />
       </div>
       <div class="form-group">
@@ -1380,21 +1380,11 @@
           <option value="">Loading therapists…</option>
         </select>
       </div>
-      <div class="form-row-2">
-        <div class="form-group">
-          <label>Time</label>
-          <input type="time" id="apptTime" value="10:00" />
-        </div>
-        <div class="form-group">
-          <label>Status</label>
-          <select id="apptStatus">
-            <option value="Confirmed">Confirmed</option>
-            <option value="Pending">Pending</option>
-            <option value="Completed">Completed</option>
-            <option value="Cancelled">Cancelled</option>
-          </select>
-        </div>
+      <div class="form-group">
+        <label>Time</label>
+        <input type="time" id="apptTime" value="10:00" />
       </div>
+      <p style="text-align:center;font-size:12px;color:var(--medium-gray);margin-top:-6px;">New appointments are booked as <strong>Pending</strong> until confirmed.</p>
       <div class="btn-group">
         <button class="btn-cancel" id="apptModalCancel">Cancel</button>
         <button class="btn-submit" id="apptModalSubmit">Book Appointment</button>
@@ -1416,9 +1406,9 @@
         <label>Products / Services</label>
         <div id="productLines">
           <div class="product-line">
-            <input type="text" class="product-name" placeholder="Item name" value="Massage Oil" />
-            <input type="number" class="product-qty" placeholder="Qty" value="2" min="1" />
-            <input type="number" class="product-price" placeholder="Price" value="90" min="0" step="0.01" />
+            <select class="product-select"><option value="">Loading products…</option></select>
+            <input type="number" class="product-qty" placeholder="Qty" value="1" min="1" />
+            <input type="number" class="product-price" placeholder="Price" value="0" min="0" step="0.01" />
             <span class="remove-product" style="display:none;"><i class="fas fa-times"></i></span>
           </div>
         </div>
@@ -1439,7 +1429,7 @@
         </div>
       </div>
       <div style="text-align:right;font-weight:600;font-size:16px;color:var(--midnight-blue);margin-top:8px;">
-        Total: <span id="saleTotalDisplay">180 MAD</span>
+        Total: <span id="saleTotalDisplay">180 AED</span>
       </div>
       <div class="btn-group">
         <button class="btn-cancel" id="saleModalCancel">Cancel</button>
@@ -1722,7 +1712,7 @@
           name: c.full_name,
           phone: c.phone || '—',
           visits: c.visits,
-          spent: Number(c.spent).toLocaleString() + ' MAD'
+          spent: Number(c.spent).toLocaleString() + ' AED'
         }));
         renderClients(clients);
         renderRecentClients();
@@ -1747,7 +1737,7 @@
           })),
           date: new Date(t.sale_date).toLocaleDateString('en-GB', { month: 'short', day: 'numeric' }),
           rawDate: t.sale_date,
-          total: Number(t.total_amount).toLocaleString() + ' MAD',
+          total: Number(t.total_amount).toLocaleString() + ' AED',
           rawTotal: Number(t.total_amount),
           method: t.payment_method.charAt(0).toUpperCase() + t.payment_method.slice(1)
         }));
@@ -1772,7 +1762,7 @@
           ? refunds.map(r => `
             <tr>
               <td>${r.product_sales?.customers?.full_name || 'Sale #' + r.sale_id?.slice(0, 8)}</td>
-              <td>${Number(r.amount).toLocaleString()} MAD</td>
+              <td>${Number(r.amount).toLocaleString()} AED</td>
               <td>${r.reason || '—'}</td>
               <td>${new Date(r.created_at).toLocaleDateString('en-GB', { month: 'short', day: 'numeric' })}</td>
             </tr>`).join('')
@@ -1809,6 +1799,11 @@
             ? therapistsList.map(t => `<option value="${t.id}">${t.name}</option>`).join('')
             : `<option value="">No therapists found</option>`;
         }
+        // Refresh any product-line dropdowns already on screen (e.g. Record Sale modal)
+        document.querySelectorAll('.product-select').forEach(sel => {
+          const current = sel.value;
+          sel.innerHTML = productOptionsHtml(current);
+        });
       }
 
       // Animates a stat card to a real, already-fetched value — used instead of
@@ -1839,7 +1834,7 @@
         animateStat(cards[0], todaysAppts.length);
         // cards[1] = Walk-in Customers — not tracked in the schema yet, stays sample data
         animateStat(cards[2], upcomingCount);
-        animateStat(cards[3], todaysSales, ' MAD');
+        animateStat(cards[3], todaysSales, ' AED');
       }
 
       // Sales page stat cards — previously these 4 cards were pure static HTML
@@ -1850,9 +1845,9 @@
         const count = salesTx.length;
         const avg = count ? Math.round(total / count) : 0;
         const cards = document.querySelectorAll('#salesStatsGrid .stat-value');
-        animateStat(cards[0], total, ' MAD');
+        animateStat(cards[0], total, ' AED');
         animateStat(cards[1], count);
-        animateStat(cards[2], avg, ' MAD');
+        animateStat(cards[2], avg, ' AED');
         // cards[3] (Refunds) is populated separately by loadRefunds(), not here
       }
 
@@ -1870,7 +1865,7 @@
         if (target) {
           let current = 0;
           const step = Math.ceil(target / 30);
-          const suffix = el.textContent.includes('MAD') ? ' MAD' : '';
+          const suffix = el.textContent.includes('AED') ? ' AED' : '';
           const timer = setInterval(() => {
             current += step;
             if (current >= target) {
@@ -1974,7 +1969,7 @@
         const serviceId = document.getElementById('apptService').value;
         const therapistId = document.getElementById('apptTherapist').value;
         const time = document.getElementById('apptTime').value;
-        const status = document.getElementById('apptStatus').value.toLowerCase();
+        const status = 'pending';
 
         if (!clientName) { alert('Please enter a client name.'); return; }
         if (!serviceId || !therapistId) { alert('Services/therapists are still loading — wait a moment and try again.'); return; }
@@ -2015,7 +2010,30 @@
         loadClients();
       });
 
-      // ---- Record Sale Modal (multi-product) ----
+      // ---- Record Sale Modal (multi-product, connected to real stock) ----
+      function productOptionsHtml(selectedId) {
+        if (!productsList.length) return '<option value="">Loading products…</option>';
+        return '<option value="">Select a product…</option>' + productsList.map(p =>
+          `<option value="${p.id}" data-price="${p.selling_price}" data-stock="${p.stock_quantity}" ${p.id === selectedId ? 'selected' : ''}>${p.name} (${p.stock_quantity} in stock)</option>`
+        ).join('');
+      }
+      function wireProductLine(line) {
+        const select = line.querySelector('.product-select');
+        const qtyInput = line.querySelector('.product-qty');
+        const priceInput = line.querySelector('.product-price');
+        select.innerHTML = productOptionsHtml();
+        select.addEventListener('change', function() {
+          const opt = this.options[this.selectedIndex];
+          const stock = parseInt(opt.dataset.stock || '0', 10);
+          priceInput.value = opt.dataset.price || 0;
+          qtyInput.max = stock;
+          if (parseInt(qtyInput.value, 10) > stock) qtyInput.value = stock || 1;
+          updateSaleTotal();
+        });
+        [select, qtyInput, priceInput].forEach(el => el.addEventListener('input', updateSaleTotal));
+        [select, qtyInput, priceInput].forEach(el => el.addEventListener('change', updateSaleTotal));
+      }
+
       function updateSaleTotal() {
         const lines = document.querySelectorAll('.product-line');
         let total = 0;
@@ -2024,96 +2042,60 @@
           const price = parseFloat(line.querySelector('.product-price').value) || 0;
           total += qty * price;
         });
-        document.getElementById('saleTotalDisplay').textContent = total + ' MAD';
+        document.getElementById('saleTotalDisplay').textContent = total + ' AED';
+      }
+
+      function freshProductLineHtml(showRemove) {
+        return `
+          <div class="product-line">
+            <select class="product-select"></select>
+            <input type="number" class="product-qty" placeholder="Qty" value="1" min="1" />
+            <input type="number" class="product-price" placeholder="Price" value="0" min="0" step="0.01" />
+            <span class="remove-product" style="display:${showRemove ? 'block' : 'none'};"><i class="fas fa-times"></i></span>
+          </div>`;
+      }
+      function refreshRemoveButtons() {
+        document.querySelectorAll('.product-line .remove-product').forEach(btn => {
+          btn.style.display = document.querySelectorAll('.product-line').length > 1 ? 'block' : 'none';
+        });
       }
 
       // Add product line
       document.getElementById('addProductBtn').addEventListener('click', function() {
         const container = document.getElementById('productLines');
-        const line = document.createElement('div');
-        line.className = 'product-line';
-        line.innerHTML = `
-          <input type="text" class="product-name" placeholder="Item name" value="" />
-          <input type="number" class="product-qty" placeholder="Qty" value="1" min="1" />
-          <input type="number" class="product-price" placeholder="Price" value="0" min="0" step="0.01" />
-          <span class="remove-product"><i class="fas fa-times"></i></span>
-        `;
-        container.appendChild(line);
-        // Show remove button on all lines except first if more than one
-        document.querySelectorAll('.product-line .remove-product').forEach((btn, idx) => {
-          btn.style.display = document.querySelectorAll('.product-line').length > 1 ? 'block' : 'none';
-        });
-        // Add event listeners
-        line.querySelectorAll('input').forEach(inp => inp.addEventListener('input', updateSaleTotal));
+        container.insertAdjacentHTML('beforeend', freshProductLineHtml(true));
+        const line = container.lastElementChild;
+        wireProductLine(line);
+        refreshRemoveButtons();
         line.querySelector('.remove-product').addEventListener('click', function() {
-          if (document.querySelectorAll('.product-line').length <= 1) {
-            alert('You need at least one product.');
-            return;
-          }
+          if (document.querySelectorAll('.product-line').length <= 1) { alert('You need at least one product.'); return; }
           line.remove();
-          document.querySelectorAll('.product-line .remove-product').forEach((btn, idx) => {
-            btn.style.display = document.querySelectorAll('.product-line').length > 1 ? 'block' : 'none';
-          });
+          refreshRemoveButtons();
           updateSaleTotal();
         });
         updateSaleTotal();
       });
 
-      // Set initial remove button visibility
-      document.querySelectorAll('.product-line .remove-product').forEach((btn, idx) => {
-        btn.style.display = document.querySelectorAll('.product-line').length > 1 ? 'block' : 'none';
-      });
-      // Add input listeners to initial line
-      document.querySelectorAll('.product-line input').forEach(inp => inp.addEventListener('input', updateSaleTotal));
+      // Wire the initial line present in the HTML
+      wireProductLine(document.querySelector('.product-line'));
+      refreshRemoveButtons();
       document.querySelector('.product-line .remove-product').addEventListener('click', function() {
-        if (document.querySelectorAll('.product-line').length <= 1) {
-          alert('You need at least one product.');
-          return;
-        }
+        if (document.querySelectorAll('.product-line').length <= 1) { alert('You need at least one product.'); return; }
         this.closest('.product-line').remove();
-        document.querySelectorAll('.product-line .remove-product').forEach((btn, idx) => {
-          btn.style.display = document.querySelectorAll('.product-line').length > 1 ? 'block' : 'none';
-        });
+        refreshRemoveButtons();
         updateSaleTotal();
       });
 
-      // Open sale modal
-      document.getElementById('qaRecordSale').addEventListener('click', () => {
-        // Set default date
-        const today = new Date().toISOString().split('T')[0];
-        document.getElementById('saleDate').value = today;
-        // Reset products to one line
+      function resetSaleModal() {
+        document.getElementById('saleDate').value = new Date().toISOString().split('T')[0];
         const container = document.getElementById('productLines');
-        container.innerHTML = `
-          <div class="product-line">
-            <input type="text" class="product-name" placeholder="Item name" value="Massage Oil" />
-            <input type="number" class="product-qty" placeholder="Qty" value="2" min="1" />
-            <input type="number" class="product-price" placeholder="Price" value="90" min="0" step="0.01" />
-            <span class="remove-product" style="display:none;"><i class="fas fa-times"></i></span>
-          </div>
-        `;
-        document.querySelectorAll('.product-line input').forEach(inp => inp.addEventListener('input', updateSaleTotal));
-        document.querySelector('.product-line .remove-product').style.display = 'none';
+        container.innerHTML = freshProductLineHtml(false);
+        wireProductLine(container.querySelector('.product-line'));
         updateSaleTotal();
-        openModal('saleModal');
-      });
-      document.getElementById('saleNewBtn').addEventListener('click', () => {
-        const today = new Date().toISOString().split('T')[0];
-        document.getElementById('saleDate').value = today;
-        const container = document.getElementById('productLines');
-        container.innerHTML = `
-          <div class="product-line">
-            <input type="text" class="product-name" placeholder="Item name" value="Massage Oil" />
-            <input type="number" class="product-qty" placeholder="Qty" value="2" min="1" />
-            <input type="number" class="product-price" placeholder="Price" value="90" min="0" step="0.01" />
-            <span class="remove-product" style="display:none;"><i class="fas fa-times"></i></span>
-          </div>
-        `;
-        document.querySelectorAll('.product-line input').forEach(inp => inp.addEventListener('input', updateSaleTotal));
-        document.querySelector('.product-line .remove-product').style.display = 'none';
-        updateSaleTotal();
-        openModal('saleModal');
-      });
+      }
+      document.getElementById('qaRecordSale').addEventListener('click', () => { resetSaleModal(); openModal('saleModal'); });
+      document.getElementById('saleNewBtn').addEventListener('click', () => { resetSaleModal(); openModal('saleModal'); });
+
       document.getElementById('saleModalCancel').addEventListener('click', () => closeModal('saleModal'));
       document.getElementById('saleModalSubmit').addEventListener('click', async function() {
         const clientName = document.getElementById('saleClientName').value.trim();
@@ -2123,30 +2105,26 @@
         if (!clientName) { alert('Please enter a client name.'); return; }
 
         const lines = document.querySelectorAll('.product-line');
-        const rawItems = [];
+        const matched = [];
         let total = 0;
-        let hasError = false;
+        let errorMsg = null;
         lines.forEach(line => {
-          const name = line.querySelector('.product-name').value.trim();
-          const qty = parseInt(line.querySelector('.product-qty').value) || 0;
+          if (errorMsg) return;
+          const select = line.querySelector('.product-select');
+          const productId = select.value;
+          const qty = parseInt(line.querySelector('.product-qty').value, 10) || 0;
           const price = parseFloat(line.querySelector('.product-price').value) || 0;
-          if (!name) { hasError = true; return; }
-          if (qty <= 0 || price < 0) { hasError = true; return; }
-          rawItems.push({ name, qty, price });
+          if (!productId) { errorMsg = 'Please select a product for every line.'; return; }
+          const product = productsList.find(p => p.id === productId);
+          if (!product) { errorMsg = 'One of the selected products could not be found — refresh and try again.'; return; }
+          if (qty <= 0) { errorMsg = 'Quantity must be at least 1.'; return; }
+          if (qty > product.stock_quantity) { errorMsg = `Only ${product.stock_quantity} of "${product.name}" in stock — reduce the quantity.`; return; }
+          if (price < 0) { errorMsg = 'Price cannot be negative.'; return; }
+          matched.push({ name: product.name, qty, price, product_id: productId });
           total += qty * price;
         });
-        if (hasError || rawItems.length === 0) { alert('Please fill in all product fields correctly.'); return; }
-
-        // match each typed product name against the real product catalog
-        const matched = [];
-        for (const item of rawItems) {
-          const product = productsList.find(p => p.name.toLowerCase() === item.name.toLowerCase());
-          if (!product) {
-            alert(`"${item.name}" doesn't match a product in your catalog exactly. Check the Products page for the exact name and try again.`);
-            return;
-          }
-          matched.push({ ...item, product_id: product.id });
-        }
+        if (errorMsg) { alert(errorMsg); return; }
+        if (!matched.length) { alert('Add at least one product.'); return; }
 
         // find or create the client
         let { data: customer } = await sb.from('customers').select('id').ilike('full_name', clientName).maybeSingle();
@@ -2191,20 +2169,22 @@
 
         closeModal('saleModal');
         document.getElementById('saleClientName').value = '';
-        notifyManagers('Sale recorded', `${clientName} — ${total} MAD (${method}).`);
-        logActivity('sale_recorded', `Sale recorded: ${clientName} — ${total} MAD`);
-        alert(`Sale recorded for ${clientName}: ${rawItems.map(i => `${i.name} (${i.qty}x)`).join(', ')} - ${total} MAD`);
+        notifyManagers('Sale recorded', `${clientName} — ${total} AED (${method}).`);
+        logActivity('sale_recorded', `Sale recorded: ${clientName} — ${total} AED`);
+        alert(`Sale recorded for ${clientName}: ${matched.map(i => `${i.name} (${i.qty}x)`).join(', ')} - ${total} AED`);
         loadSales();
         loadClients();
         loadCatalog(); // refresh product stock numbers used by this modal
       });
 
-      // ---- Add Client (quick action) ----
-      document.getElementById('qaAddClient').addEventListener('click', function() {
+      // ---- Add Client (Dashboard quick action + Clients page button) ----
+      function openNewClientModal() {
         document.getElementById('newClientName').value = '';
         document.getElementById('newClientPhone').value = '';
         openModal('newClientModal');
-      });
+      }
+      document.getElementById('qaAddClient').addEventListener('click', openNewClientModal);
+      document.getElementById('clientNewBtn').addEventListener('click', openNewClientModal);
       document.getElementById('newClientCancel').addEventListener('click', () => closeModal('newClientModal'));
       document.getElementById('newClientSubmit').addEventListener('click', async function() {
         const name = document.getElementById('newClientName').value.trim();
@@ -2213,6 +2193,7 @@
 
         const { error } = await sb.from('customers').insert({ full_name: name, phone });
         if (error) { alert('Could not add client: ' + error.message); return; }
+        logActivity('client_added', `New client added: ${name}`);
 
         closeModal('newClientModal');
         loadClients();
@@ -2261,8 +2242,8 @@
           sale_id: saleId, amount, reason, refunded_by: profile.id
         });
         if (error) { alert('Could not record refund: ' + error.message); return; }
-        logActivity('refund_recorded', `Refund recorded: ${amount} MAD`);
-        notifyManagers('Refund recorded', `A refund of ${amount} MAD was recorded.`);
+        logActivity('refund_recorded', `Refund recorded: ${amount} AED`);
+        notifyManagers('Refund recorded', `A refund of ${amount} AED was recorded.`);
 
         closeModal('newRefundModal');
         loadRefunds();
@@ -2470,7 +2451,7 @@
         loggedOutModal.classList.add('show');
       });
       document.getElementById('backToLogin').addEventListener('click', () => {
-        window.location.href = '/login';
+        window.location.href = 'login.html';
       });
       document.querySelectorAll('.modal-overlay').forEach(overlay => {
         overlay.addEventListener('click', e => { if (e.target === overlay) overlay.classList.remove('show'); });

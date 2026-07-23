@@ -1488,23 +1488,15 @@ body.dark .modal-box h3 { color: #f0f0f0; }
       <div class="section-title"><i class="fas fa-chart-line"></i> Performance Summary</div>
       <div class="stats-grid">
         <div class="stat-card"><div class="stat-head"><span>Sessions This Week</span><i class="fas fa-spa"></i></div><div class="stat-value" data-target="24">24</div><span class="stat-trend"><i class="fas fa-arrow-up"></i> +4</span></div>
-        <div class="stat-card"><div class="stat-head"><span>Revenue Generated</span><i class="fas fa-coins"></i></div><div class="stat-value" data-target="3840">3,840 MAD</div><span class="stat-trend"><i class="fas fa-arrow-up"></i> +11%</span></div>
+        <div class="stat-card"><div class="stat-head"><span>Revenue Generated</span><i class="fas fa-coins"></i></div><div class="stat-value" data-target="3840">3,840 AED</div><span class="stat-trend"><i class="fas fa-arrow-up"></i> +11%</span></div>
         <div class="stat-card"><div class="stat-head"><span>Average Rating</span><i class="fas fa-star"></i></div><div class="stat-value" data-target="49">4.9</div><span class="stat-trend"><i class="fas fa-arrow-up"></i> +0.1</span></div>
         <div class="stat-card"><div class="stat-head"><span>Returning Clients</span><i class="fas fa-user-check"></i></div><div class="stat-value" data-target="18">18</div><span class="stat-trend"><i class="fas fa-arrow-up"></i> +3</span></div>
       </div>
 
-      <!-- SECTION 7 + 8: RECENT ACTIVITY + CALENDAR -->
-      <div class="flex-grid" style="margin-top:4px;">
-        <div>
-          <div class="section-title" style="margin-top:0;"><i class="fas fa-history"></i> Recent Activity</div>
-          <div class="activity-list" id="activityList"></div>
-        </div>
-        <div>
-          <div class="today-widget">
-            <h3><i class="fas fa-calendar-day"></i> Today's Schedule Calendar <span class="date-badge"><i class="far fa-calendar-alt"></i> Jul 2026</span></h3>
-            <div class="mini-calendar" id="miniCalendar"></div>
-          </div>
-        </div>
+      <!-- SECTION 8: CALENDAR -->
+      <div class="today-widget" style="margin-top:4px;">
+        <h3><i class="fas fa-calendar-day"></i> Today's Schedule Calendar <span class="date-badge"><i class="far fa-calendar-alt"></i> Jul 2026</span></h3>
+        <div class="mini-calendar" id="miniCalendar"></div>
       </div>
     </div>
     <!-- /DASHBOARD PAGE -->
@@ -1873,47 +1865,6 @@ body.dark .modal-box h3 { color: #f0f0f0; }
       });
     });
   }
-
-  // =====================================================
-  // SECTION 7 — RECENT ACTIVITY
-  // =====================================================
-  const activityList = document.getElementById('activityList');
-  const activityIcons = {
-    appointment_created: 'fa-calendar-check',
-    appointment_completed: 'fa-check-circle',
-    sale_recorded: 'fa-shopping-bag',
-    expense_added: 'fa-receipt',
-    product_added: 'fa-cube',
-    client_added: 'fa-user-plus',
-    walk_in_logged: 'fa-walking',
-    refund_recorded: 'fa-undo'
-  };
-  function timeAgo(dateStr) {
-    const diffMs = Date.now() - new Date(dateStr).getTime();
-    const mins = Math.floor(diffMs / 60000);
-    if (mins < 1) return 'just now';
-    if (mins < 60) return mins + 'm ago';
-    const hrs = Math.floor(mins / 60);
-    if (hrs < 24) return hrs + 'h ago';
-    return Math.floor(hrs / 24) + 'd ago';
-  }
-  async function loadActivity() {
-    const { data, error } = await sb
-      .from('activity_log')
-      .select('action_type, description, created_at')
-      .order('created_at', { ascending: false })
-      .limit(6);
-    if (error) { console.error('loadActivity:', error.message); return; }
-    activityList.innerHTML = data.length
-      ? data.map(a => `
-        <div class="activity-item">
-          <i class="fas ${activityIcons[a.action_type] || 'fa-stream'}"></i>
-          <span>${a.description}</span>
-          <span style="margin-left:auto;font-size:12px;color:var(--medium-gray);white-space:nowrap;">${timeAgo(a.created_at)}</span>
-        </div>`).join('')
-      : `<div style="color:var(--medium-gray);">Nothing recent.</div>`;
-  }
-  loadActivity();
 
   // =====================================================
   // SECTION 8 — MINI CALENDAR
@@ -2488,7 +2439,7 @@ body.dark .modal-box h3 { color: #f0f0f0; }
     loggedOutModal.classList.add('show');
   });
   document.getElementById('backToLogin').addEventListener('click', () => {
-    window.location.href = '/login';
+    window.location.href = 'login.html';
   });
   [logoutModal, loggedOutModal].forEach(overlay => {
     overlay.addEventListener('click', e => { if (e.target === overlay) overlay.classList.remove('show'); });
